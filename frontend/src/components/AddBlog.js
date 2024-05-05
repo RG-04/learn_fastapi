@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const AddBlog = () => {
     const MAXLEN = 500;
+    const MAXLEN_TITLE = 30;
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -20,6 +21,11 @@ const AddBlog = () => {
             alert("Content cannot be more than " + MAXLEN + " characters");
             return;
         }
+
+        if (title.length > MAXLEN_TITLE) {
+            alert("Title cannot be more than " + MAXLEN_TITLE + " characters");
+            return;
+        }   
 
         fetch("http://localhost:8000/docs/", {
             method: "POST",
