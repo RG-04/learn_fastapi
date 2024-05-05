@@ -51,7 +51,7 @@ const Home = () => {
                 className="w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-torange-500"
               />
             </div>
-    <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mx-auto block">Add Blog</button>
+    <button onClick={() => navigate("/add")} className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mx-auto block">Add Blog</button>
     </div>
     <div className="container mx-auto mt-8 px-4 w-full flex flex-wrap justify-around">
         {blogs.filter((blog) => blog.id.includes(search)).map((blog) => (
