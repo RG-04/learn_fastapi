@@ -1,10 +1,24 @@
 from typing import Annotated
 
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 from backend.api import api
 from pydantic import BaseModel
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+    "localhost:3000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class Doc(BaseModel):
@@ -27,7 +41,7 @@ async def delete_doc(doc_id: str):
 async def add_doc(doc: Doc):
     return api.add_doc({'id': doc.id, 'content': doc.content})
 
-@app.get("/docs/{doc_id}/similar/")
+@app.get("/docs/{doc_id}/similar")
 async def get_similar_doc(doc_id: str):
     return api.get_similar_doc({'id': doc_id})
 

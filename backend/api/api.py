@@ -9,7 +9,7 @@ def get_all_docs():
     docs = []
     for file in os.listdir(DOCUMENT_PATH):
         with open(os.path.join(DOCUMENT_PATH, file)) as f:
-            docs.append({'id': f.split('.')[0], 'content': f.read()})
+            docs.append({'id': file.split('.')[0], 'content': f.read()})
     return {'docs': docs, 'status_code': '200'}
 
 def get_doc(req):
@@ -40,8 +40,16 @@ def get_similar_doc(req):
     loader = DirectoryLoader(DOCUMENT_PATH, glob="**/*.txt")
 
     docsAll = loader.load()
+    ids =  []
+    for doc in docsAll:
+        ids.append(doc.metadata['source'].split('\\')[-1].split('.')[0])
 
-    db = Chroma.from_documents(docsAll, embeddings)
+    for i, doc in enumerate(docsAll):
+        doc.metadata['id'] = ids[i]
+
+    print("IDS", ids)
+    dbnew = Chroma.from_documents(docsAll, embeddings, ids=ids)
+    print("DB", dbnew.get())
 
     query_id = req['id']
 
@@ -51,11 +59,14 @@ def get_similar_doc(req):
     with open(os.path.join(DOCUMENT_PATH, query_id + '.txt')) as f:
         query = f.read()
 
-    docs = db.similarity_search(query, k=2)
+    docs = dbnew.similarity_search(query, k=2)
 
     if len(docs) < 2:
         print(len(docs), 'docs')
         print(len(docsAll), 'docsAll')
         return {'message': 'No similar documents found', 'status_code': '405'}
-
-    return {'docs': docs[1].page_content, 'status_code': '200'}
+    
+    ret_docs = []
+    for doc in docs[1:]:
+        ret_docs.append({'id': doc.metadata['id'], 'content': doc.page_content})
+    return {'docs': ret_docs, 'status_code': '200'}

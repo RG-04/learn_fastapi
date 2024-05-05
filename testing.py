@@ -11,17 +11,19 @@ loader = DirectoryLoader(DOCUMENTS_PATH, glob="**/*.txt")
 
 docsAll = loader.load()
 
-db = Chroma.from_documents(docsAll, embeddings)
+ids = []
+for doc in docsAll:
+    ids.append(doc.metadata['source'].split('\\')[1])
 
-query = "What did the president say about Ketanji Brown Jackson"
-docs = db.similarity_search(query, k=1)
-print(docs[0].page_content)
+print(ids)
 
-for file in os.listdir(DOCUMENTS_PATH):
-    with open(os.path.join(DOCUMENTS_PATH, file)) as f:
-        print(f)
-        # query = f.read()
-        # docs = db.similarity_search(query, k=1)
-        # print("query: ", query)
-        # print(docs[0].page_content)
+db = Chroma.from_documents(docsAll, embeddings, ids=ids)
+print("DB", db.get())
+
+# for file in os.listdir(DOCUMENTS_PATH):
+#     with open(os.path.join(DOCUMENTS_PATH, file)) as f:
+#         query = f.read()
+#         docs = db.similarity_search(query, k=2)
+#         print("query: ", query)
+#         print(docs[1].id)
 
